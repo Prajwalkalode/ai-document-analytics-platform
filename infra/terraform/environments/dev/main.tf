@@ -1,0 +1,29 @@
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+}
+
+locals {
+  project     = "ai-document-analytics-platform"
+  environment = "dev"
+}
+
+module "users_table" {
+  source      = "../../modules/users"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
