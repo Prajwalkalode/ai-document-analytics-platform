@@ -1,9 +1,13 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { z } from 'zod';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
+import { z } from "zod";
 
 const userSchema = z.object({
   email: z.string().email(),
@@ -16,17 +20,21 @@ const loginSchema = z.object({
   password: z.string().min(8),
 });
 
-const tableName = process.env.AUTH_TABLE_NAME || 'AuthUsers';
-const region = process.env.AWS_REGION || 'us-east-1';
+const tableName = process.env.AUTH_TABLE_NAME;
+
+if (!tableName) {
+  throw new Error("AUTH_TABLE_NAME is required");
+}
+const region = process.env.AWS_REGION || "us-east-1";
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({ region }));
 
 const buildUser = ({ email, name, passwordHash }) => {
   const now = new Date().toISOString();
   return {
-    userId: `USR${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
+    userId: `USR${crypto.randomBytes(4).toString("hex").toUpperCase()}`,
     email,
     name,
-    role: 'USER',
+    role: "USER",
     passwordHash,
     isActive: true,
     createdAt: now,
@@ -35,15 +43,17 @@ const buildUser = ({ email, name, passwordHash }) => {
 };
 
 const findActiveUserByEmail = async (email) => {
-  const command = new ScanCommand({
+  const command = new QueryCommand({
     TableName: tableName,
-    FilterExpression: '#email = :email AND isActive = :active',
+    IndexName: "EmailIndex",
+    KeyConditionExpression: "#email = :email",
+    FilterExpression: "isActive = :active",
     ExpressionAttributeNames: {
-      '#email': 'email',
+      "#email": "email",
     },
     ExpressionAttributeValues: {
-      ':email': email,
-      ':active': true,
+      ":email": email,
+      ":active": true,
     },
     Limit: 1,
   });
@@ -58,21 +68,27 @@ const register = async (req, res) => {
     const existingUser = await findActiveUserByEmail(parsed.email);
 
     if (existingUser) {
-      return res.status(409).json({ message: 'A user with this email already exists.' });
+      return res
+        .status(409)
+        .json({ message: "A user with this email already exists." });
     }
 
     const passwordHash = await bcrypt.hash(parsed.password, 10);
-    const user = buildUser({ email: parsed.email, name: parsed.name, passwordHash });
+    const user = buildUser({
+      email: parsed.email,
+      name: parsed.name,
+      passwordHash,
+    });
 
     await dynamoDb.send(
       new PutCommand({
         TableName: tableName,
         Item: user,
-      })
+      }),
     );
 
     return res.status(201).json({
-      message: 'User registered successfully!',
+      message: "User registered successfully!",
       user: {
         userId: user.userId,
         email: user.email,
@@ -84,11 +100,11 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Register error:', error);
+    console.error("Register error:", error);
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
     }
-    return res.status(500).json({ message: 'Unable to register user.' });
+    return res.status(500).json({ message: "Unable to register user." });
   }
 };
 
@@ -98,38 +114,49 @@ const login = async (req, res) => {
     const user = await findActiveUserByEmail(parsed.email);
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
+      return res.status(401).json({ message: "Invalid email or password." });
     }
 
     const isMatch = await bcrypt.compare(parsed.password, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
+      return res.status(401).json({ message: "Invalid email or password." });
     }
 
     if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET is required');
+      throw new Error("JWT_SECRET is required");
     }
 
     const token = jwt.sign(
-      { userId: user.userId, email: user.email, name: user.name },
+      {
+        userId: user.userId,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: "1h" },
     );
 
     return res.json({
-      message: 'User logged in successfully!',
+      message: "User logged in successfully!",
       user: {
         name: user.name,
       },
       token,
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
     }
-    return res.status(500).json({ message: 'Unable to log in.' });
+    return res.status(500).json({ message: "Unable to log in." });
   }
 };
 
-export { register, login };
+const me = async (req, res) => {
+  return res.json({
+    user: req.user,
+  });
+};
+
+export { register, login, me };
