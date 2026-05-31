@@ -1,0 +1,12 @@
+{
+  "name": "ai-document-analytics-platform",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Utilizing the power of AI to analyze documents",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Prajwalkalode/ai-document-analytics-platform.git"
+  },
+  "author": "Prajwal Kalode",
+  "license": "ISC"
+  }
