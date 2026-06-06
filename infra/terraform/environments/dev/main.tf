@@ -27,3 +27,13 @@ module "users_table" {
     Environment = local.environment
   }
 }
+
+module "documents" {
+  source      = "../../modules/documents"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
