@@ -1,0 +1,311 @@
+openapi: 3.0.3
+info:
+  title: ai-document-analytics-platform Auth Service
+  version: 1.0.0
+  description: Central OpenAPI definition for the auth service.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+              examples:
+                success:
+                  value:
+                    message: User registered successfully!
+                    user:
+                      userId: USR1A2B3C4D
+                      email: user@example.com
+                      name: Jane Doe
+                      role: USER
+                      isActive: true
+                      createdAt: '2026-06-07T10:30:00.000Z'
+                      updatedAt: '2026-06-07T10:30:00.000Z'
+        '400':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '409':
+          description: Email already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate a user and return a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: User logged in successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                success:
+                  value:
+                    message: User logged in successfully!
+                    user:
+                      name: Jane Doe
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: Invalid email or password.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Get the current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+              examples:
+                success:
+                  value:
+                    user:
+                      userId: USR1A2B3C4D
+                      email: user@example.com
+                      name: Jane Doe
+                      role: USER
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Get health status for the auth service
+      responses:
+        '200':
+          description: Service health status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  value:
+                    status: UP
+                    service: auth-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      jwt: UP
+                degraded_dynamodb:
+                  value:
+                    status: DEGRADED
+                    service: auth-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: DOWN
+                      jwt: UP
+                degraded_jwt:
+                  value:
+                    status: DEGRADED
+                    service: auth-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      jwt: DOWN
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          example: Jane Doe
+        password:
+          type: string
+          format: password
+          example: P@ssw0rd123
+      required:
+        - email
+        - name
+        - password
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User registered successfully!
+        user:
+          type: object
+          properties:
+            userId:
+              type: string
+              example: USR1A2B3C4D
+            email:
+              type: string
+              format: email
+              example: user@example.com
+            name:
+              type: string
+              example: Jane Doe
+            role:
+              type: string
+              example: USER
+            isActive:
+              type: boolean
+              example: true
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: P@ssw0rd123
+      required:
+        - email
+        - password
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User logged in successfully!
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Jane Doe
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    MeResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            userId:
+              type: string
+              example: USR1A2B3C4D
+            email:
+              type: string
+              format: email
+              example: user@example.com
+            name:
+              type: string
+              example: Jane Doe
+            role:
+              type: string
+              example: USER
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: UP
+        service:
+          type: string
+          example: auth-service
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-06-07T10:30:00.000Z'
+        dependencies:
+          type: object
+          properties:
+            dynamodb:
+              type: string
+              example: UP
+            jwt:
+              type: string
+              example: UP
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Unable to log in.
+    ValidationErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: array
+                items:
+                  type: string
+              message:
+                type: string
