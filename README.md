@@ -65,6 +65,73 @@ The `upload-service` allows authenticated users to upload documents to S3 and pe
 
 ### Local Startup
 ```bash
+cd services/upload-service
+npm install
+npm run dev
+```
+
+### API Endpoints
+- `POST /upload` - Upload a document
+- `GET /health` - Health and dependency status for the upload service
+
+### Example curl Requests
+Upload document:
+```bash
+curl -X POST http://localhost:3000/upload \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -F "file=@document.pdf"
+```
+
+Health check:
+```bash
+curl http://localhost:3000/health
+```
+
+## Processing Service
+The `processing-service` receives a document ID, downloads the uploaded document from S3, extracts text, stores the extracted content in DynamoDB, and updates document status.
+
+### Environment Variables
+- `PORT` - Port for the processing service
+- `AWS_REGION` - AWS region for S3 and DynamoDB operations
+- `DOCUMENTS_TABLE_NAME` - DynamoDB table containing uploaded document metadata
+- `DOCUMENT_CONTENT_TABLE_NAME` - DynamoDB table containing extracted document content
+- `DOCUMENTS_BUCKET_NAME` - S3 bucket for uploaded documents
+- `JWT_SECRET` - Secret used to validate JWT tokens
+
+### Local Startup
+```bash
+cd services/processing-service
+npm install
+npm run dev
+```
+
+### API Endpoints
+- `POST /process` - Process an uploaded document
+- `GET /health` - Health and dependency status for the processing service
+
+### Example curl Requests
+Process document:
+```bash
+curl -X POST http://localhost:3000/process \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -d '{"documentId":"DOC12345678"}'
+```
+
+Health check:
+```bash
+curl http://localhost:3000/health
+```
+
+### Environment Variables
+- `PORT` - Port for the upload service
+- `AWS_REGION` - AWS region for S3 and DynamoDB operations
+- `DOCUMENTS_TABLE_NAME` - DynamoDB table for document metadata
+- `DOCUMENTS_BUCKET_NAME` - S3 bucket for uploaded documents
+- `JWT_SECRET` - Secret used to validate JWT tokens
+
+### Local Startup
+```bash
 cd upload-service
 npm install
 npm run dev

@@ -37,3 +37,13 @@ module "documents" {
     Environment = local.environment
   }
 }
+
+module "document_content" {
+  source      = "../../modules/document_content"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
