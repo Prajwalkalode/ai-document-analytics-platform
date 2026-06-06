@@ -11,6 +11,8 @@ tags:
     description: Authentication endpoints
   - name: Upload
     description: Document upload endpoints
+  - name: Processing
+    description: Document processing endpoints
   - name: Health
     description: Health check endpoints
 paths:
@@ -190,6 +192,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /process:
+    post:
+      tags:
+        - Processing
+      summary: Process an uploaded document
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessRequest'
+      responses:
+        '200':
+          description: Document processed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessResponse'
+              examples:
+                success:
+                  value:
+                    message: Document processed successfully
+                    documentId: DOC12345678
+                    status: PROCESSED
+                    textLength: 1234
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Document not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /health:
     get:
       tags:
@@ -215,6 +268,14 @@ paths:
                   value:
                     status: UP
                     service: upload-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      s3: UP
+                healthy_processing_service:
+                  value:
+                    status: UP
+                    service: processing-service
                     timestamp: '2026-06-07T10:30:00.000Z'
                     dependencies:
                       dynamodb: UP
@@ -339,6 +400,25 @@ components:
             role:
               type: string
               example: USER
+    ProcessRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+          example: DOC12345678
+      required:
+        - documentId
+    ProcessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        documentId:
+          type: string
+        status:
+          type: string
+        textLength:
+          type: integer
     HealthResponse:
       type: object
       properties:

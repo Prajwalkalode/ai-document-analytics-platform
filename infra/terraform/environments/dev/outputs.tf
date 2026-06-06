@@ -22,3 +22,13 @@ output "documents_bucket_name" {
   description = "Name of the deployed Documents S3 bucket."
   value       = module.documents.documents_bucket_name
 }
+
+output "document_content_table_name" {
+  description = "Name of the deployed Document Content DynamoDB table."
+  value       = module.document_content.document_content_table_name
+}
+
+output "document_content_table_arn" {
+  description = "ARN of the deployed Document Content DynamoDB table."
+  value       = module.document_content.document_content_table_arn
+}
