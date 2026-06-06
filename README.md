@@ -52,3 +52,37 @@ Health check:
 ```bash
 curl http://localhost:3000/health
 ```
+
+## Upload Service
+The `upload-service` allows authenticated users to upload documents to S3 and persist metadata in DynamoDB.
+
+### Environment Variables
+- `PORT` - Port for the upload service
+- `AWS_REGION` - AWS region for S3 and DynamoDB operations
+- `DOCUMENTS_TABLE_NAME` - DynamoDB table for document metadata
+- `DOCUMENTS_BUCKET_NAME` - S3 bucket for uploaded documents
+- `JWT_SECRET` - Secret used to validate JWT tokens
+
+### Local Startup
+```bash
+cd upload-service
+npm install
+npm run dev
+```
+
+### API Endpoints
+- `POST /upload` - Upload a document
+- `GET /health` - Health and dependency status for the upload service
+
+### Example curl Requests
+Upload document:
+```bash
+curl -X POST http://localhost:3000/upload \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -F "file=@document.pdf"
+```
+
+Health check:
+```bash
+curl http://localhost:3000/health
+```

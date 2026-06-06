@@ -1,11 +1,18 @@
 openapi: 3.0.3
 info:
-  title: ai-document-analytics-platform Auth Service
+  title: ai-document-analytics-platform API
   version: 1.0.0
-  description: Central OpenAPI definition for the auth service.
+  description: Central OpenAPI definition for platform services.
 servers:
   - url: http://localhost:3000
     description: Local development server
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Upload
+    description: Document upload endpoints
+  - name: Health
+    description: Health check endpoints
 paths:
   /auth/register:
     post:
@@ -126,11 +133,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /upload:
+    post:
+      tags:
+        - Upload
+      summary: Upload a document
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '201':
+          description: Document uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  documentId:
+                    type: string
+                  status:
+                    type: string
+              examples:
+                success:
+                  value:
+                    message: Document uploaded successfully
+                    documentId: DOC1A2B3C4D
+                    status: UPLOADED
+        '400':
+          description: Validation or upload error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /health:
     get:
       tags:
         - Health
-      summary: Get health status for the auth service
+      summary: Get health status for the current service
       responses:
         '200':
           description: Service health status.
@@ -139,7 +203,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
               examples:
-                healthy:
+                healthy_auth_service:
                   value:
                     status: UP
                     service: auth-service
@@ -147,6 +211,14 @@ paths:
                     dependencies:
                       dynamodb: UP
                       jwt: UP
+                healthy_upload_service:
+                  value:
+                    status: UP
+                    service: upload-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      s3: UP
                 degraded_dynamodb:
                   value:
                     status: DEGRADED
@@ -282,13 +354,8 @@ components:
           example: '2026-06-07T10:30:00.000Z'
         dependencies:
           type: object
-          properties:
-            dynamodb:
-              type: string
-              example: UP
-            jwt:
-              type: string
-              example: UP
+          additionalProperties:
+            type: string
     ErrorResponse:
       type: object
       properties:
