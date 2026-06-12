@@ -47,3 +47,13 @@ module "document_content" {
     Environment = local.environment
   }
 }
+
+module "ai_results" {
+  source      = "../../modules/ai_results"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
