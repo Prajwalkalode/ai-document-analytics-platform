@@ -13,6 +13,8 @@ tags:
     description: Document upload endpoints
   - name: Processing
     description: Document processing endpoints
+  - name: AI
+    description: AI analysis endpoints
   - name: Health
     description: Health check endpoints
 paths:
@@ -243,6 +245,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /analyze:
+    post:
+      tags:
+        - AI
+      summary: Analyze a document with AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+      responses:
+        '200':
+          description: Document analyzed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResponse'
+              examples:
+                success:
+                  value:
+                    message: Document analyzed successfully
+                    documentId: DOC12345678
+                    summary: This is a summary of the document...
+                    keywords:
+                      - keyword1
+                      - keyword2
+                    category: TECHNICAL
+                    sentiment: POSITIVE
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Document content not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: AI analysis failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /health:
     get:
       tags:
@@ -456,3 +513,38 @@ components:
                   type: string
               message:
                 type: string
+    AnalyzeRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+          example: DOC12345678
+      required:
+        - documentId
+    AnalyzeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        documentId:
+          type: string
+        summary:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+          enum:
+            - TECHNICAL
+            - FINANCE
+            - LEGAL
+            - GENERAL
+        sentiment:
+          type: string
+          enum:
+            - POSITIVE
+            - NEGATIVE
+            - NEUTRAL
+
