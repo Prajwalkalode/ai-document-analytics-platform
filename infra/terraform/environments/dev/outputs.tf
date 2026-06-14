@@ -32,13 +32,3 @@ output "document_content_table_arn" {
   description = "ARN of the deployed Document Content DynamoDB table."
   value       = module.document_content.document_content_table_arn
 }
-
-output "analytics_table_name" {
-  description = "Name of the deployed Analytics DynamoDB table."
-  value       = module.analytics.analytics_table_name
-}
-
-output "analytics_table_arn" {
-  description = "ARN of the deployed Analytics DynamoDB table."
-  value       = module.analytics.analytics_table_arn
-}
