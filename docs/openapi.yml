@@ -15,6 +15,8 @@ tags:
     description: Document processing endpoints
   - name: AI
     description: AI analysis endpoints
+  - name: Analytics
+    description: Analytics endpoints
   - name: Health
     description: Health check endpoints
 paths:
@@ -300,6 +302,194 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /analytics/overview:
+    get:
+      tags:
+        - Analytics
+      summary: Get analytics document summary
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Summary of document analytics.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverviewResponse'
+              examples:
+                success:
+                  value:
+                    totalDocuments: 10
+                    uploadedDocuments: 2
+                    processedDocuments: 8
+                    failedDocuments: 0
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/categories:
+    get:
+      tags:
+        - Analytics
+      summary: Get category distribution from analysis data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Category distribution counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsCategoriesResponse'
+              examples:
+                success:
+                  value:
+                    TECHNICAL: 5
+                    BUSINESS: 2
+                    GENERAL: 3
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/sentiment:
+    get:
+      tags:
+        - Analytics
+      summary: Get sentiment distribution from analysis data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Sentiment distribution counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsSentimentResponse'
+              examples:
+                success:
+                  value:
+                    POSITIVE: 4
+                    NEUTRAL: 5
+                    NEGATIVE: 1
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/keywords:
+    get:
+      tags:
+        - Analytics
+      summary: Get top keywords from analysis data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Top keywords and counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsKeywordsResponse'
+              examples:
+                success:
+                  value:
+                    keywords:
+                      - keyword: python
+                        count: 4
+                      - keyword: data
+                        count: 3
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/document/{documentId}:
+    get:
+      tags:
+        - Analytics
+      summary: Get combined document metadata and analysis
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Document metadata and analysis.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsDocumentResponse'
+              examples:
+                success:
+                  value:
+                    document:
+                      documentId: DOC12345678
+                      status: PROCESSED
+                    analysis:
+                      documentId: DOC12345678
+                      category: TECHNICAL
+                      sentiment: POSITIVE
+                      keywords:
+                        - python
+                        - nodejs
+        '400':
+          description: Invalid document id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Document not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /health:
     get:
       tags:
@@ -547,4 +737,73 @@ components:
             - POSITIVE
             - NEGATIVE
             - NEUTRAL
+    AnalyticsOverviewResponse:
+      type: object
+      properties:
+        totalDocuments:
+          type: integer
+          example: 10
+        uploadedDocuments:
+          type: integer
+          example: 2
+        processedDocuments:
+          type: integer
+          example: 8
+        failedDocuments:
+          type: integer
+          example: 0
+    AnalyticsCategoriesResponse:
+      type: object
+      additionalProperties:
+        type: integer
+      example:
+        TECHNICAL: 5
+        BUSINESS: 2
+        GENERAL: 3
+    AnalyticsSentimentResponse:
+      type: object
+      additionalProperties:
+        type: integer
+      example:
+        POSITIVE: 4
+        NEUTRAL: 5
+        NEGATIVE: 1
+    AnalyticsKeywordsResponse:
+      type: object
+      properties:
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              keyword:
+                type: string
+              count:
+                type: integer
+      example:
+        keywords:
+          - keyword: python
+            count: 4
+          - keyword: data
+            count: 3
+    AnalyticsDocumentResponse:
+      type: object
+      properties:
+        document:
+          type: object
+          additionalProperties: true
+        analysis:
+          type: object
+          additionalProperties: true
+      example:
+        document:
+          documentId: DOC12345678
+          status: PROCESSED
+        analysis:
+          documentId: DOC12345678
+          category: TECHNICAL
+          sentiment: POSITIVE
+          keywords:
+            - python
+            - nodejs
 
