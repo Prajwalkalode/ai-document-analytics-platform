@@ -1,0 +1,809 @@
+openapi: 3.0.3
+info:
+  title: ai-document-analytics-platform API
+  version: 1.0.0
+  description: Central OpenAPI definition for platform services.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Upload
+    description: Document upload endpoints
+  - name: Processing
+    description: Document processing endpoints
+  - name: AI
+    description: AI analysis endpoints
+  - name: Analytics
+    description: Analytics endpoints
+  - name: Health
+    description: Health check endpoints
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+              examples:
+                success:
+                  value:
+                    message: User registered successfully!
+                    user:
+                      userId: USR1A2B3C4D
+                      email: user@example.com
+                      name: Jane Doe
+                      role: USER
+                      isActive: true
+                      createdAt: '2026-06-07T10:30:00.000Z'
+                      updatedAt: '2026-06-07T10:30:00.000Z'
+        '400':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '409':
+          description: Email already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate a user and return a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: User logged in successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                success:
+                  value:
+                    message: User logged in successfully!
+                    user:
+                      name: Jane Doe
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: Invalid email or password.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Get the current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+              examples:
+                success:
+                  value:
+                    user:
+                      userId: USR1A2B3C4D
+                      email: user@example.com
+                      name: Jane Doe
+                      role: USER
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /upload:
+    post:
+      tags:
+        - Upload
+      summary: Upload a document
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '201':
+          description: Document uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  documentId:
+                    type: string
+                  status:
+                    type: string
+              examples:
+                success:
+                  value:
+                    message: Document uploaded successfully
+                    documentId: DOC1A2B3C4D
+                    status: UPLOADED
+        '400':
+          description: Validation or upload error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /process:
+    post:
+      tags:
+        - Processing
+      summary: Process an uploaded document
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessRequest'
+      responses:
+        '200':
+          description: Document processed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessResponse'
+              examples:
+                success:
+                  value:
+                    message: Document processed successfully
+                    documentId: DOC12345678
+                    status: PROCESSED
+                    textLength: 1234
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Document not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analyze:
+    post:
+      tags:
+        - AI
+      summary: Analyze a document with AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+      responses:
+        '200':
+          description: Document analyzed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResponse'
+              examples:
+                success:
+                  value:
+                    message: Document analyzed successfully
+                    documentId: DOC12345678
+                    summary: This is a summary of the document...
+                    keywords:
+                      - keyword1
+                      - keyword2
+                    category: TECHNICAL
+                    sentiment: POSITIVE
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Document content not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: AI analysis failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/overview:
+    get:
+      tags:
+        - Analytics
+      summary: Get analytics document summary
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Summary of document analytics.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverviewResponse'
+              examples:
+                success:
+                  value:
+                    totalDocuments: 10
+                    uploadedDocuments: 2
+                    processedDocuments: 8
+                    failedDocuments: 0
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/categories:
+    get:
+      tags:
+        - Analytics
+      summary: Get category distribution from analysis data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Category distribution counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsCategoriesResponse'
+              examples:
+                success:
+                  value:
+                    TECHNICAL: 5
+                    BUSINESS: 2
+                    GENERAL: 3
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/sentiment:
+    get:
+      tags:
+        - Analytics
+      summary: Get sentiment distribution from analysis data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Sentiment distribution counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsSentimentResponse'
+              examples:
+                success:
+                  value:
+                    POSITIVE: 4
+                    NEUTRAL: 5
+                    NEGATIVE: 1
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/keywords:
+    get:
+      tags:
+        - Analytics
+      summary: Get top keywords from analysis data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Top keywords and counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsKeywordsResponse'
+              examples:
+                success:
+                  value:
+                    keywords:
+                      - keyword: python
+                        count: 4
+                      - keyword: data
+                        count: 3
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/document/{documentId}:
+    get:
+      tags:
+        - Analytics
+      summary: Get combined document metadata and analysis
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Document metadata and analysis.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsDocumentResponse'
+              examples:
+                success:
+                  value:
+                    document:
+                      documentId: DOC12345678
+                      status: PROCESSED
+                    analysis:
+                      documentId: DOC12345678
+                      category: TECHNICAL
+                      sentiment: POSITIVE
+                      keywords:
+                        - python
+                        - nodejs
+        '400':
+          description: Invalid document id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Document not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Get health status for the current service
+      responses:
+        '200':
+          description: Service health status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy_auth_service:
+                  value:
+                    status: UP
+                    service: auth-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      jwt: UP
+                healthy_upload_service:
+                  value:
+                    status: UP
+                    service: upload-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      s3: UP
+                healthy_processing_service:
+                  value:
+                    status: UP
+                    service: processing-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      s3: UP
+                degraded_dynamodb:
+                  value:
+                    status: DEGRADED
+                    service: auth-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: DOWN
+                      jwt: UP
+                degraded_jwt:
+                  value:
+                    status: DEGRADED
+                    service: auth-service
+                    timestamp: '2026-06-07T10:30:00.000Z'
+                    dependencies:
+                      dynamodb: UP
+                      jwt: DOWN
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          example: Jane Doe
+        password:
+          type: string
+          format: password
+          example: P@ssw0rd123
+      required:
+        - email
+        - name
+        - password
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User registered successfully!
+        user:
+          type: object
+          properties:
+            userId:
+              type: string
+              example: USR1A2B3C4D
+            email:
+              type: string
+              format: email
+              example: user@example.com
+            name:
+              type: string
+              example: Jane Doe
+            role:
+              type: string
+              example: USER
+            isActive:
+              type: boolean
+              example: true
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: P@ssw0rd123
+      required:
+        - email
+        - password
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User logged in successfully!
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Jane Doe
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    MeResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            userId:
+              type: string
+              example: USR1A2B3C4D
+            email:
+              type: string
+              format: email
+              example: user@example.com
+            name:
+              type: string
+              example: Jane Doe
+            role:
+              type: string
+              example: USER
+    ProcessRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+          example: DOC12345678
+      required:
+        - documentId
+    ProcessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        documentId:
+          type: string
+        status:
+          type: string
+        textLength:
+          type: integer
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: UP
+        service:
+          type: string
+          example: auth-service
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-06-07T10:30:00.000Z'
+        dependencies:
+          type: object
+          additionalProperties:
+            type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Unable to log in.
+    ValidationErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: array
+                items:
+                  type: string
+              message:
+                type: string
+    AnalyzeRequest:
+      type: object
+      properties:
+        documentId:
+          type: string
+          example: DOC12345678
+      required:
+        - documentId
+    AnalyzeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        documentId:
+          type: string
+        summary:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+          enum:
+            - TECHNICAL
+            - FINANCE
+            - LEGAL
+            - GENERAL
+        sentiment:
+          type: string
+          enum:
+            - POSITIVE
+            - NEGATIVE
+            - NEUTRAL
+    AnalyticsOverviewResponse:
+      type: object
+      properties:
+        totalDocuments:
+          type: integer
+          example: 10
+        uploadedDocuments:
+          type: integer
+          example: 2
+        processedDocuments:
+          type: integer
+          example: 8
+        failedDocuments:
+          type: integer
+          example: 0
+    AnalyticsCategoriesResponse:
+      type: object
+      additionalProperties:
+        type: integer
+      example:
+        TECHNICAL: 5
+        BUSINESS: 2
+        GENERAL: 3
+    AnalyticsSentimentResponse:
+      type: object
+      additionalProperties:
+        type: integer
+      example:
+        POSITIVE: 4
+        NEUTRAL: 5
+        NEGATIVE: 1
+    AnalyticsKeywordsResponse:
+      type: object
+      properties:
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              keyword:
+                type: string
+              count:
+                type: integer
+      example:
+        keywords:
+          - keyword: python
+            count: 4
+          - keyword: data
+            count: 3
+    AnalyticsDocumentResponse:
+      type: object
+      properties:
+        document:
+          type: object
+          additionalProperties: true
+        analysis:
+          type: object
+          additionalProperties: true
+      example:
+        document:
+          documentId: DOC12345678
+          status: PROCESSED
+        analysis:
+          documentId: DOC12345678
+          category: TECHNICAL
+          sentiment: POSITIVE
+          keywords:
+            - python
+            - nodejs
+
