@@ -27,3 +27,33 @@ module "users_table" {
     Environment = local.environment
   }
 }
+
+module "documents" {
+  source      = "../../modules/documents"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
+
+module "document_content" {
+  source      = "../../modules/document_content"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
+
+module "ai_results" {
+  source      = "../../modules/ai_results"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
