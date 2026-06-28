@@ -2,7 +2,17 @@ openapi: 3.0.3
 info:
   title: ai-document-analytics-platform API
   version: 1.0.0
-  description: Central OpenAPI definition for platform services.
+  description: |
+    Central OpenAPI definition for platform services.
+
+    End-to-end document processing flow:
+    1. Auth: register or login to obtain a JWT.
+    2. Upload: upload a document and create its record.
+    3. Process: extract text content from the uploaded document.
+    4. Analyze: run AI analysis to generate summary, keywords, category, and sentiment.
+    5. Analytics: query the stored analysis results for reporting and insights.
+
+    Typical sequence: POST /auth/register or /auth/login -> POST /upload -> POST /process -> POST /analyze -> GET /analytics/overview or /analytics/document/{documentId}.
 servers:
   - url: http://localhost:3000
     description: Local development server
@@ -144,6 +154,7 @@ paths:
       tags:
         - Upload
       summary: Upload a document
+      description: Step 2 of the document flow. Upload a file to create a document record before processing it.
       security:
         - bearerAuth: []
       requestBody:
@@ -201,6 +212,7 @@ paths:
       tags:
         - Processing
       summary: Process an uploaded document
+      description: Step 3 of the document flow. Extract text from the uploaded document so it can be analyzed.
       security:
         - bearerAuth: []
       requestBody:
@@ -252,6 +264,7 @@ paths:
       tags:
         - AI
       summary: Analyze a document with AI
+      description: Step 4 of the document flow. Run AI analysis on the processed document content and store the result.
       security:
         - bearerAuth: []
       requestBody:
@@ -307,6 +320,7 @@ paths:
       tags:
         - Analytics
       summary: Get analytics document summary
+      description: Step 5 of the document flow. Retrieve an overview of analytics data generated from processed and analyzed documents.
       security:
         - bearerAuth: []
       responses:
@@ -709,6 +723,14 @@ components:
         documentId:
           type: string
           example: DOC12345678
+        provider:
+          type: string
+          description: Optional AI provider override for analysis (openai, gemini, mock, mock_gemini)
+          enum:
+            - openai
+            - gemini
+            - mock
+            - mock_gemini
       required:
         - documentId
     AnalyzeResponse:
