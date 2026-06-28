@@ -4,11 +4,12 @@ import { analyzeDocumentWithAi } from '../services/aiAnalysisService.js';
 
 const analyzeSchema = z.object({
   documentId: z.string().min(1),
+  provider: z.enum(['openai', 'gemini', 'mock', 'mock_gemini']).optional(),
 });
 
 export const analyzeDocument = async (req, res) => {
   try {
-    const { documentId } = analyzeSchema.parse(req.body);
+    const { documentId, provider } = analyzeSchema.parse(req.body);
 
     const document = await getDocumentContent(documentId);
 
@@ -19,6 +20,7 @@ export const analyzeDocument = async (req, res) => {
     const analysis = await analyzeDocumentWithAi({
       documentId,
       text: document.extractedText,
+      provider,
     });
 
     return res.status(200).json({

@@ -6,8 +6,8 @@ const region = process.env.AWS_REGION;
 const ddbClient = new DynamoDBClient({ region });
 const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
 
-export const analyzeDocumentWithAi = async ({ documentId, text }) => {
-  const provider = createAiProvider();
+export const analyzeDocumentWithAi = async ({ documentId, text, provider: providerOverride }) => {
+  const provider = createAiProvider(providerOverride);
   const analysis = await provider.generateAnalysis(text);
 
   const tableName = process.env.AI_RESULTS_TABLE_NAME;
