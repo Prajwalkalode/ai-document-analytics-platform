@@ -123,12 +123,22 @@ Health check:
 curl http://localhost:3000/health
 ```
 
-### Environment Variables
-- `PORT` - Port for the upload service
-- `AWS_REGION` - AWS region for S3 and DynamoDB operations
-- `DOCUMENTS_TABLE_NAME` - DynamoDB table for document metadata
-- `DOCUMENTS_BUCKET_NAME` - S3 bucket for uploaded documents
-- `JWT_SECRET` - Secret used to validate JWT tokens
+## Continuous Integration
+This repository includes a GitHub Actions pipeline defined in `.github/workflows/ci.yml`.
+
+The CI workflow:
+- runs on `push` and `pull_request` events
+- installs Node.js using the LTS version
+- caches npm dependencies per service using each service `package-lock.json`
+- validates Lambda package installations by running `npm ci` and `npm ls --depth=0` in every service folder
+- runs `npm test` and `npm run coverage` for each microservice
+- checks Terraform formatting with `terraform fmt -check`
+- initializes and validates Terraform under `infra/terraform`
+
+The workflow fails when:
+- any service tests fail
+- any service coverage command fails
+- Terraform formatting or validation fails
 
 ### Local Startup
 ```bash

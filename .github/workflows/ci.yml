@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push: {}
+  pull_request: {}
+
+jobs:
+  lambda-validate:
+    name: Lambda dependency install validation
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [ai-service, analytics-service, auth-service, processing-service, upload-service]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 'lts/*'
+          cache: npm
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies for ${{ matrix.service }}
+        working-directory: services/${{ matrix.service }}
+        run: npm ci
+
+      - name: Validate installed package tree for ${{ matrix.service }}
+        working-directory: services/${{ matrix.service }}
+        run: npm ls --depth=0
+
+  test-and-coverage:
+    name: Test and coverage for each microservice
+    needs: lambda-validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [ai-service, analytics-service, auth-service, processing-service, upload-service]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 'lts/*'
+          cache: npm
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies for ${{ matrix.service }}
+        working-directory: services/${{ matrix.service }}
+        run: npm ci
+
+      - name: Run tests for ${{ matrix.service }}
+        working-directory: services/${{ matrix.service }}
+        run: npm test
+
+      - name: Run coverage for ${{ matrix.service }}
+        working-directory: services/${{ matrix.service }}
+        run: npm run coverage
+
+  terraform-validation:
+    name: Terraform formatting and validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: latest
+
+      - name: Check Terraform formatting
+        working-directory: infra/terraform
+        run: terraform fmt -check
+
+      - name: Initialize Terraform
+        working-directory: infra/terraform
+        run: terraform init -input=false
+
+      - name: Validate Terraform configuration
+        working-directory: infra/terraform
+        run: terraform validate
