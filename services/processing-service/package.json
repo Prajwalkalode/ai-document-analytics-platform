@@ -11,7 +11,6 @@
     "coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "~3.1057.0",
     "@aws-sdk/client-s3": "~3.1057.0",
     "@aws-sdk/lib-dynamodb": "~3.1057.0",
     "dotenv": "~17.4.2",
