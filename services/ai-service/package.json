@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "test": "vitest run",
     "test:watch": "vitest --watch",
-    "coverage": "vitest run --coverage --coverage-provider=v8"
+    "coverage": "vitest --coverage"
   },
   "keywords": [],
   "author": "",
