@@ -21,7 +21,6 @@
     "@vendia/serverless-express": "~4.0.0",
     "js-yaml": "~5.2.0",
     "jsonwebtoken": "~9.0.3",
-    "swagger-ui-express": "~4.6.3",
     "zod": "~4.4.3"
   },
   "devDependencies": {
