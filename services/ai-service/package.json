@@ -17,6 +17,7 @@
     "@aws-sdk/lib-dynamodb": "~3.1057.0",
     "dotenv": "~17.4.2",
     "express": "~5.2.1",
+    "@vendia/serverless-express": "^4.0.0",
     "jsonwebtoken": "~9.0.3",
     "js-yaml": "~5.2.0",
     "openai": "~6.39.0",
