@@ -9,7 +9,7 @@ app.use('/auth', authRouter);
 app.use('/', healthRouter);
 
 app.use('/', (req, res) => {
-    return res.status(404).json({ message: 'No route found' });
+  return res.status(404).json({ message: 'No route found' });
 });
 
 export default app;

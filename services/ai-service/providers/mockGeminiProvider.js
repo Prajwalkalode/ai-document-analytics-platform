@@ -1,6 +1,18 @@
 // Lightweight mock provider intended to mimic Gemini responses for local testing
 const STOP_WORDS = new Set([
-  'the', 'and', 'is', 'in', 'to', 'of', 'a', 'for', 'on', 'with', 'that', 'this', 'it',
+  'the',
+  'and',
+  'is',
+  'in',
+  'to',
+  'of',
+  'a',
+  'for',
+  'on',
+  'with',
+  'that',
+  'this',
+  'it',
 ]);
 
 const normalizeText = (text) =>
@@ -17,21 +29,35 @@ const buildKeywordList = (words) => {
     return acc;
   }, {});
 
-  return Object.entries(frequency).sort(([, a], [, b]) => b - a).slice(0, 10).map(([word]) => word);
+  return Object.entries(frequency)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 10)
+    .map(([word]) => word);
 };
 
 const determineCategory = (text) => {
   const normalized = text.toLowerCase();
   if (normalized.includes('invoice') || normalized.includes('billing')) return 'FINANCE';
   if (normalized.includes('contract') || normalized.includes('agreement')) return 'LEGAL';
-  if (normalized.includes('python') || normalized.includes('node') || normalized.includes('javascript')) return 'TECHNICAL';
+  if (
+    normalized.includes('python') ||
+    normalized.includes('node') ||
+    normalized.includes('javascript')
+  )
+    return 'TECHNICAL';
   return 'GENERAL';
 };
 
 const determineSentiment = (text) => {
   const normalized = text.toLowerCase();
-  if (normalized.includes('good') || normalized.includes('great') || normalized.includes('excellent')) return 'POSITIVE';
-  if (normalized.includes('bad') || normalized.includes('poor') || normalized.includes('error')) return 'NEGATIVE';
+  if (
+    normalized.includes('good') ||
+    normalized.includes('great') ||
+    normalized.includes('excellent')
+  )
+    return 'POSITIVE';
+  if (normalized.includes('bad') || normalized.includes('poor') || normalized.includes('error'))
+    return 'NEGATIVE';
   return 'NEUTRAL';
 };
 

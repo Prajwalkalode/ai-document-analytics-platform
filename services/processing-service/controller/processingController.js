@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { authenticate } from '../middleware/authenticate.js';
-import { getDocumentMetadata, updateDocumentStatus, saveDocumentContent } from '../services/documentService.js';
+import {
+  getDocumentMetadata,
+  updateDocumentStatus,
+  saveDocumentContent,
+} from '../services/documentService.js';
 import { downloadFileFromS3 } from '../services/s3Service.js';
 import { extractTextFromBuffer } from '../services/textExtractionService.js';
 

@@ -5,9 +5,18 @@ vi.mock('@aws-sdk/lib-dynamodb', () => {
   let lastGetInput = null;
   return {
     DynamoDBDocumentClient: {
-      from: () => ({ send: (cmd) => { lastGetInput = cmd.input; return Promise.resolve({ Item: { documentId: 'DOC1', extractedText: 't' } }); } }),
+      from: () => ({
+        send: (cmd) => {
+          lastGetInput = cmd.input;
+          return Promise.resolve({ Item: { documentId: 'DOC1', extractedText: 't' } });
+        },
+      }),
     },
-    GetCommand: class GetCommand { constructor(input) { this.input = input; } },
+    GetCommand: class GetCommand {
+      constructor(input) {
+        this.input = input;
+      }
+    },
     __getLastGetInput: () => lastGetInput,
   };
 });

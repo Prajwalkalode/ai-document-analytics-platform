@@ -24,7 +24,7 @@ export const analyzeDocumentWithAi = async ({ documentId, text, provider: provid
         sentiment: analysis.sentiment,
         analyzedAt,
       },
-    }),
+    })
   );
 
   return { ...analysis, analyzedAt };

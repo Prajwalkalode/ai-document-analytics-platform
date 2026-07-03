@@ -1,16 +1,16 @@
-import { DynamoDBClient, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, DescribeTableCommand } from '@aws-sdk/client-dynamodb';
 
-const region = process.env.AWS_REGION || "ap-south-1";
+const region = process.env.AWS_REGION || 'ap-south-1';
 
 const health = async (req, res) => {
   const dependencies = {
-    dynamodb: "DOWN",
-    jwt: "DOWN",
+    dynamodb: 'DOWN',
+    jwt: 'DOWN',
   };
   const timestamp = new Date().toISOString();
 
   if (process.env.JWT_SECRET) {
-    dependencies.jwt = "UP";
+    dependencies.jwt = 'UP';
   }
 
   try {
@@ -18,22 +18,20 @@ const health = async (req, res) => {
     await client.send(
       new DescribeTableCommand({
         TableName: process.env.AUTH_TABLE_NAME,
-      }),
+      })
     );
-    dependencies.dynamodb = "UP";
+    dependencies.dynamodb = 'UP';
   } catch (error) {
-    console.error("Health dependency check failed:", error);
+    console.error('Health dependency check failed:', error);
   }
 
-  const overallStatus = Object.values(dependencies).every(
-    (value) => value === "UP",
-  )
-    ? "UP"
-    : "DEGRADED";
+  const overallStatus = Object.values(dependencies).every((value) => value === 'UP')
+    ? 'UP'
+    : 'DEGRADED';
 
   return res.status(200).json({
     status: overallStatus,
-    service: "auth-service",
+    service: 'auth-service',
     timestamp,
     dependencies,
   });

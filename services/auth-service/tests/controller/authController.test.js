@@ -11,16 +11,30 @@ let putResponse = null;
 vi.mock('@aws-sdk/lib-dynamodb', () => {
   return {
     DynamoDBDocumentClient: {
-      from: () => ({ send: (cmd) => {
-        if (cmd.constructor.name === 'QueryCommand') return Promise.resolve(queryResponse);
-        if (cmd.constructor.name === 'PutCommand') return Promise.resolve(putResponse);
-        return Promise.resolve({});
-      } }),
+      from: () => ({
+        send: (cmd) => {
+          if (cmd.constructor.name === 'QueryCommand') return Promise.resolve(queryResponse);
+          if (cmd.constructor.name === 'PutCommand') return Promise.resolve(putResponse);
+          return Promise.resolve({});
+        },
+      }),
     },
-    PutCommand: class PutCommand { constructor(input) { this.input = input; } },
-    QueryCommand: class QueryCommand { constructor(input) { this.input = input; } },
-    __setQueryResponse: (r) => { queryResponse = r; },
-    __setPutResponse: (r) => { putResponse = r; },
+    PutCommand: class PutCommand {
+      constructor(input) {
+        this.input = input;
+      }
+    },
+    QueryCommand: class QueryCommand {
+      constructor(input) {
+        this.input = input;
+      }
+    },
+    __setQueryResponse: (r) => {
+      queryResponse = r;
+    },
+    __setPutResponse: (r) => {
+      putResponse = r;
+    },
   };
 });
 
@@ -75,7 +89,9 @@ describe('authController', () => {
     await register(req, res);
 
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'User registered successfully!' }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'User registered successfully!' })
+    );
   });
 
   it('returns 409 when user exists', async () => {
@@ -86,7 +102,9 @@ describe('authController', () => {
     await register(req, res);
 
     expect(res.status).toHaveBeenCalledWith(409);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'A user with this email already exists.' }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'A user with this email already exists.' })
+    );
   });
 
   it('returns 400 on invalid register payload', async () => {

@@ -7,7 +7,7 @@ export const safeScan = async ({ ddbDocClient, command, params }) => {
       new command({
         ...params,
         ExclusiveStartKey,
-      }),
+      })
     );
 
     if (result.Items) {
