@@ -12,7 +12,7 @@ export const getHealth = async (req, res) => {
     await client.send(
       new DescribeTableCommand({
         TableName: process.env.AI_ANALYSIS_TABLE_NAME,
-      }),
+      })
     );
     dependencies.dynamodb = 'UP';
   } catch (error) {

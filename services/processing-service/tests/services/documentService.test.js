@@ -8,16 +8,33 @@ vi.mock('@aws-sdk/lib-dynamodb', () => {
   let lastUpdateInput = null;
   return {
     DynamoDBDocumentClient: {
-      from: () => ({ send: (cmd) => {
-        if (cmd.constructor.name === 'GetCommand') return Promise.resolve({ Item: docItem });
-        if (cmd.constructor.name === 'PutCommand') return Promise.resolve({});
-        if (cmd.constructor.name === 'UpdateCommand') return Promise.resolve({});
-        return Promise.resolve({});
-      } }),
+      from: () => ({
+        send: (cmd) => {
+          if (cmd.constructor.name === 'GetCommand') return Promise.resolve({ Item: docItem });
+          if (cmd.constructor.name === 'PutCommand') return Promise.resolve({});
+          if (cmd.constructor.name === 'UpdateCommand') return Promise.resolve({});
+          return Promise.resolve({});
+        },
+      }),
     },
-    GetCommand: class GetCommand { constructor(input) { lastGetInput = input; this.input = input; } },
-    PutCommand: class PutCommand { constructor(input) { lastPutInput = input; this.input = input; } },
-    UpdateCommand: class UpdateCommand { constructor(input) { lastUpdateInput = input; this.input = input; } },
+    GetCommand: class GetCommand {
+      constructor(input) {
+        lastGetInput = input;
+        this.input = input;
+      }
+    },
+    PutCommand: class PutCommand {
+      constructor(input) {
+        lastPutInput = input;
+        this.input = input;
+      }
+    },
+    UpdateCommand: class UpdateCommand {
+      constructor(input) {
+        lastUpdateInput = input;
+        this.input = input;
+      }
+    },
     __getLastGetInput: () => lastGetInput,
     __getLastPutInput: () => lastPutInput,
     __getLastUpdateInput: () => lastUpdateInput,
@@ -25,11 +42,18 @@ vi.mock('@aws-sdk/lib-dynamodb', () => {
 });
 
 vi.mock('@aws-sdk/client-dynamodb', () => ({
-  DynamoDBClient: function () { return { send: vi.fn() }; },
-  DescribeTableCommand: class DescribeTableCommand { constructor(input) { this.input = input; } },
+  DynamoDBClient: function () {
+    return { send: vi.fn() };
+  },
+  DescribeTableCommand: class DescribeTableCommand {
+    constructor(input) {
+      this.input = input;
+    }
+  },
 }));
 
-const { getDocumentMetadata, saveDocumentContent, updateDocumentStatus, checkTable } = await import('../../services/documentService.js');
+const { getDocumentMetadata, saveDocumentContent, updateDocumentStatus, checkTable } =
+  await import('../../services/documentService.js');
 
 describe('documentService', () => {
   it('getDocumentMetadata returns item', async () => {
@@ -38,11 +62,25 @@ describe('documentService', () => {
   });
 
   it('saveDocumentContent calls put', async () => {
-    await expect(saveDocumentContent({ tableName: 'T', documentId: 'DOC1', extractedText: 'x', processedAt: 'now' })).resolves.toBeUndefined();
+    await expect(
+      saveDocumentContent({
+        tableName: 'T',
+        documentId: 'DOC1',
+        extractedText: 'x',
+        processedAt: 'now',
+      })
+    ).resolves.toBeUndefined();
   });
 
   it('updateDocumentStatus calls update', async () => {
-    await expect(updateDocumentStatus({ tableName: 'T', documentId: 'DOC1', status: 'PROCESSED', updatedAt: 'now' })).resolves.toBeUndefined();
+    await expect(
+      updateDocumentStatus({
+        tableName: 'T',
+        documentId: 'DOC1',
+        status: 'PROCESSED',
+        updatedAt: 'now',
+      })
+    ).resolves.toBeUndefined();
   });
 
   it('checkTable calls describe', async () => {

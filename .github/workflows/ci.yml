@@ -5,8 +5,8 @@ on:
   pull_request: {}
 
 jobs:
-  lambda-validate:
-    name: Lambda dependency install validation
+  service-checks:
+    name: Service lint, format, tests, coverage, and lambda validation
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -27,32 +27,13 @@ jobs:
         working-directory: services/${{ matrix.service }}
         run: npm ci
 
-      - name: Validate installed package tree for ${{ matrix.service }}
+      - name: Run ESLint for ${{ matrix.service }}
         working-directory: services/${{ matrix.service }}
-        run: npm ls --depth=0
+        run: npm run lint
 
-  test-and-coverage:
-    name: Test and coverage for each microservice
-    needs: lambda-validate
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        service: [ai-service, analytics-service, auth-service, processing-service, upload-service]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: 'lts/*'
-          cache: npm
-          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
-
-      - name: Install dependencies for ${{ matrix.service }}
+      - name: Run Prettier check for ${{ matrix.service }}
         working-directory: services/${{ matrix.service }}
-        run: npm ci
+        run: npm run format:check
 
       - name: Run tests for ${{ matrix.service }}
         working-directory: services/${{ matrix.service }}
@@ -61,6 +42,10 @@ jobs:
       - name: Run coverage for ${{ matrix.service }}
         working-directory: services/${{ matrix.service }}
         run: npm run coverage
+
+      - name: Validate installed package tree for ${{ matrix.service }}
+        working-directory: services/${{ matrix.service }}
+        run: npm ls --depth=0
 
   terraform-validation:
     name: Terraform formatting and validation

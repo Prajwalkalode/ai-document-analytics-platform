@@ -32,7 +32,8 @@ for (const svc of services) {
 
   // Try to extract the Coverage summary block produced by Vitest
   const combined = output;
-  const regex = /Statements\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)[\s\S]*?Branches\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)[\s\S]*?Functions\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)[\s\S]*?Lines\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)/i;
+  const regex =
+    /Statements\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)[\s\S]*?Branches\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)[\s\S]*?Functions\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)[\s\S]*?Lines\s*:\s*([\d.]+)%\s*\(\s*(\d+)\/(\d+)\s*\)/i;
   const m = combined.match(regex);
   if (m) {
     summaries.push({

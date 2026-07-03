@@ -6,7 +6,7 @@ export const getDocumentById = async ({ ddbDocClient, tableName, documentId }) =
     new GetCommand({
       TableName: tableName,
       Key: { documentId },
-    }),
+    })
   );
 
   return result.Item || null;

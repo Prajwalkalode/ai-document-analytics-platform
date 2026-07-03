@@ -12,4 +12,6 @@ export const analysisItems = [
 ];
 
 export const documentD2 = { documentId: 'D2', status: 'PROCESSED' };
-export const analysisForD2 = [ { documentId: 'D2', category: 'TECH', sentiment: 'POS', keywords: ['AI'] } ];
+export const analysisForD2 = [
+  { documentId: 'D2', category: 'TECH', sentiment: 'POS', keywords: ['AI'] },
+];

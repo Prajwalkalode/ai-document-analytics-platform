@@ -34,7 +34,7 @@ describe('uploadController', () => {
 
   it('returns 401 on invalid user', async () => {
     req.file = fileMock;
-    req.user = { }; // invalid
+    req.user = {}; // invalid
     await uploadDocument(req, res);
     expect(res.status).toHaveBeenCalledWith(401);
   });
@@ -46,7 +46,12 @@ describe('uploadController', () => {
     await uploadDocument(req, res);
 
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document uploaded successfully', documentId: docMetadata.documentId }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Document uploaded successfully',
+        documentId: docMetadata.documentId,
+      })
+    );
   });
 
   it('returns 500 when S3 upload fails', async () => {

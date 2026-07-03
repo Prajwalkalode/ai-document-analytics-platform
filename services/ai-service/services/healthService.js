@@ -8,7 +8,7 @@ export const checkDependencies = async () => {
   await ddbClient.send(
     new DescribeTableCommand({
       TableName: tableName,
-    }),
+    })
   );
   return true;
 };

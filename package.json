@@ -9,10 +9,19 @@
   },
   "author": "Prajwal Kalode",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "t": "node ./scripts/run-all-tests.js",
     "c": "node ./scripts/run-all-coverage.js",
     "test": "npm run t",
-    "coverage": "npm run c"
+    "coverage": "npm run c",
+    "lint:all": "npm run lint --prefix services/auth-service && npm run lint --prefix services/upload-service && npm run lint --prefix services/processing-service && npm run lint --prefix services/ai-service && npm run lint --prefix services/analytics-service",
+    "format:check:all": "npm run format:check --prefix services/auth-service && npm run format:check --prefix services/upload-service && npm run format:check --prefix services/processing-service && npm run format:check --prefix services/ai-service && npm run format:check --prefix services/analytics-service",
+    "check": "npm run lint:all && npm run format:check:all && npm run test && npm run coverage"
+  },
+  "devDependencies": {
+    "eslint": "^10.6.0",
+    "prettier": "^3.0.0",
+    "@eslint/js": "^10.0.1"
   }
 }

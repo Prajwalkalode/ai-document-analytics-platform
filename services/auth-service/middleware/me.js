@@ -1,19 +1,19 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 export const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).json({
-      message: "Authentication required",
+      message: 'Authentication required',
     });
   }
 
   try {
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(' ')[1];
 
     if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is required");
+      throw new Error('JWT_SECRET is required');
     }
 
     req.user = jwt.verify(token, process.env.JWT_SECRET);
@@ -21,7 +21,7 @@ export const authenticate = (req, res, next) => {
     next();
   } catch {
     return res.status(401).json({
-      message: "Invalid token",
+      message: 'Invalid token',
     });
   }
 };

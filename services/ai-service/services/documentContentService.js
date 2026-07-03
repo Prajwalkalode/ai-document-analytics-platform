@@ -12,7 +12,7 @@ export const getDocumentContent = async (documentId) => {
     new GetCommand({
       TableName: tableName,
       Key: { documentId },
-    }),
+    })
   );
 
   return result.Item;

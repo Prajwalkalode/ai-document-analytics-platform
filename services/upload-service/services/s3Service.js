@@ -10,7 +10,7 @@ export const uploadFileToS3 = async ({ bucketName, key, body, contentType }) => 
       Key: key,
       Body: body,
       ContentType: contentType,
-    }),
+    })
   );
 
   return key;

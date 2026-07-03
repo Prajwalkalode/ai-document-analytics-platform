@@ -16,7 +16,7 @@ export const downloadFileFromS3 = async ({ bucketName, key }) => {
     new GetObjectCommand({
       Bucket: bucketName,
       Key: key,
-    }),
+    })
   );
 
   if (!response.Body) {

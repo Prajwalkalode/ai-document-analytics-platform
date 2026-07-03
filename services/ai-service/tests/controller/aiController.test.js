@@ -38,7 +38,12 @@ describe('aiController - analyzeDocument', () => {
     await analyzeDocument(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document analyzed successfully', documentId: sampleRequest.documentId }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Document analyzed successfully',
+        documentId: sampleRequest.documentId,
+      })
+    );
   });
 
   it('returns 400 on validation error', async () => {

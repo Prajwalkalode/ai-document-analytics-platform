@@ -10,7 +10,7 @@ export const saveDocumentMetadata = async ({ tableName, documentMetadata }) => {
     new PutCommand({
       TableName: tableName,
       Item: documentMetadata,
-    }),
+    })
   );
 };
 
@@ -18,6 +18,6 @@ export const checkTable = async ({ tableName }) => {
   await ddbClient.send(
     new DescribeTableCommand({
       TableName: tableName,
-    }),
+    })
   );
 };
