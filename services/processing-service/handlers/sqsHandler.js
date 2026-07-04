@@ -1,4 +1,5 @@
 import { processDocumentService } from '../services/processDocumentService.js';
+import { publishDocumentProcessedEvent } from '../services/eventPublisher.js';
 
 const parseSqsMessage = (record) => {
   if (!record?.body) {
@@ -29,8 +30,15 @@ export const handleSqsEvent = async (event) => {
     console.log(`Processing document ${message.documentId}`);
 
     try {
-      await processDocumentService(message.documentId);
+      const result = await processDocumentService(message.documentId);
       console.log('Processing completed');
+      console.log('Publishing DocumentProcessed event');
+      await publishDocumentProcessedEvent({
+        documentId: result.documentId,
+        processedAt: result.processedAt,
+        textLength: result.textLength,
+      });
+      console.log('SNS publish succeeded');
     } catch (error) {
       console.error('Processing failed:', error);
       throw error;
