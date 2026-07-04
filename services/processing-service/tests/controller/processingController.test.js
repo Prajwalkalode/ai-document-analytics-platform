@@ -6,6 +6,10 @@ vi.mock('../../services/processDocumentService.js', () => ({
   processDocumentService: mockProcessDocumentService,
 }));
 
+vi.mock('../../services/eventPublisher.js', () => ({
+  publishDocumentProcessedEvent: vi.fn(() => Promise.resolve()),
+}));
+
 const { processDocument } = await import('../../controller/processingController.js');
 
 describe('processingController', () => {

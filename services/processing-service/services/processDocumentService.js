@@ -52,6 +52,7 @@ export const processDocumentService = async (documentId) => {
   return {
     documentId,
     status: 'PROCESSED',
+    processedAt,
     textLength: extractedText.length,
   };
 };
