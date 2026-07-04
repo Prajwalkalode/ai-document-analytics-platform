@@ -9,6 +9,10 @@ vi.mock('../../services/documentService.js', () => ({
   saveDocumentMetadata: vi.fn(() => Promise.resolve()),
 }));
 
+vi.mock('../../services/eventPublisher.js', () => ({
+  publishDocumentUploadedEvent: vi.fn(() => Promise.resolve()),
+}));
+
 vi.mock('../../utils/documentBuilder.js', () => ({
   buildDocumentMetadata: vi.fn(() => docMetadata),
 }));
@@ -50,6 +54,22 @@ describe('uploadController', () => {
       expect.objectContaining({
         message: 'Document uploaded successfully',
         documentId: docMetadata.documentId,
+      })
+    );
+  });
+
+  it('publishes a DocumentUploaded event after persistence succeeds', async () => {
+    const eventPublisher = await import('../../services/eventPublisher.js');
+
+    await uploadDocument(req, res);
+
+    expect(eventPublisher.publishDocumentUploadedEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: 'DocumentUploaded',
+        documentId: docMetadata.documentId,
+        userId: docMetadata.userId,
+        s3Key: docMetadata.s3Key,
+        uploadedAt: docMetadata.uploadedAt,
       })
     );
   });
