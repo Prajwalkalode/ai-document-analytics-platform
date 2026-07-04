@@ -32,3 +32,23 @@ output "document_content_table_arn" {
   description = "ARN of the deployed Document Content DynamoDB table."
   value       = module.document_content.document_content_table_arn
 }
+
+output "messaging_sns_topic_arn" {
+  description = "ARN of the deployed SNS topic for document events."
+  value       = module.messaging.sns_topic_arn
+}
+
+output "messaging_sqs_queue_url" {
+  description = "URL of the deployed SQS queue for document events."
+  value       = module.messaging.sqs_queue_url
+}
+
+output "messaging_sqs_queue_arn" {
+  description = "ARN of the deployed SQS queue for document events."
+  value       = module.messaging.sqs_queue_arn
+}
+
+output "messaging_sqs_dlq_arn" {
+  description = "ARN of the deployed SQS dead-letter queue."
+  value       = module.messaging.sqs_dlq_arn
+}
