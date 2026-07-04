@@ -1,6 +1,8 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 
-const snsClient = new SNSClient({ region: process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1' });
+const snsClient = new SNSClient({
+  region: process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1',
+});
 const topicArn = process.env.DOCUMENT_UPLOADED_TOPIC_ARN;
 
 export const publishDocumentUploadedEvent = async ({ documentId, userId, s3Key, uploadedAt }) => {
