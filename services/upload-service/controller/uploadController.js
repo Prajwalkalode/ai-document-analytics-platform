@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { uploadFileToS3 } from '../services/s3Service.js';
 import { saveDocumentMetadata } from '../services/documentService.js';
+import { publishDocumentUploadedEvent } from '../services/eventPublisher.js';
 import { buildDocumentMetadata } from '../utils/documentBuilder.js';
 
 const userSchema = z.object({
@@ -36,6 +37,17 @@ export const uploadDocument = async (req, res) => {
       tableName,
       documentMetadata,
     });
+
+    console.log('Upload completed:', documentMetadata.documentId);
+    console.log('Publishing DocumentUploaded event');
+    await publishDocumentUploadedEvent({
+      eventType: 'DocumentUploaded',
+      documentId: documentMetadata.documentId,
+      userId: documentMetadata.userId,
+      s3Key: documentMetadata.s3Key,
+      uploadedAt: documentMetadata.uploadedAt,
+    });
+    console.log('SNS publish succeeded');
 
     return res.status(201).json({
       message: 'Document uploaded successfully',
