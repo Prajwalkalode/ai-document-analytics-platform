@@ -10,6 +10,10 @@ vi.mock('../../services/aiAnalysisService.js', () => ({
   analyzeDocumentWithAi: vi.fn(),
 }));
 
+vi.mock('../../services/eventPublisher.js', () => ({
+  publishAnalysisCompletedEvent: vi.fn(() => Promise.resolve()),
+}));
+
 import { analyzeDocument } from '../../controller/aiController.js';
 import { getDocumentContent } from '../../services/documentContentService.js';
 import { analyzeDocumentWithAi } from '../../services/aiAnalysisService.js';
