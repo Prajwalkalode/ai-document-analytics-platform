@@ -7,6 +7,7 @@ import {
 } from '../services/documentService.js';
 import { downloadFileFromS3 } from '../services/s3Service.js';
 import { extractTextFromBuffer } from '../services/textExtractionService.js';
+import { publishDocumentProcessedEvent } from '../services/eventPublisher.js';
 
 const processSchema = z.object({
   documentId: z.string().min(1),
@@ -57,6 +58,15 @@ export const processDocument = async (req, res) => {
       status: 'PROCESSED',
       updatedAt: processedAt,
     });
+
+    console.log('Processing completed');
+    console.log('Publishing DocumentProcessed');
+    await publishDocumentProcessedEvent({
+      documentId,
+      processedAt,
+      textLength: extractedText.length,
+    });
+    console.log('Publish succeeded');
 
     return res.status(200).json({
       message: 'Document processed successfully',
