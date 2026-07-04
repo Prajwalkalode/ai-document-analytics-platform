@@ -57,3 +57,13 @@ module "ai_results" {
     Environment = local.environment
   }
 }
+
+module "messaging" {
+  source      = "../../modules/messaging"
+  project     = local.project
+  environment = local.environment
+  tags = {
+    Project     = local.project
+    Environment = local.environment
+  }
+}
