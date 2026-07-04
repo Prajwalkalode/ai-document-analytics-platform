@@ -16,9 +16,9 @@ export const processDocument = async (req, res) => {
     console.log('Processing completed');
     console.log('Publishing DocumentProcessed');
     await publishDocumentProcessedEvent({
-      documentId,
-      processedAt,
-      textLength: extractedText.length,
+      documentId: result.documentId,
+      processedAt: result.processedAt,
+      textLength: result.textLength,
     });
     console.log('Publish succeeded');
 
