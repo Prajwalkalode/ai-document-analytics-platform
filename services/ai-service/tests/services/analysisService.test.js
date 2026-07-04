@@ -25,7 +25,12 @@ describe('analysisService', () => {
 
   it('publishes AnalysisCompleted after analysis succeeds', async () => {
     mockGetDocumentContent.mockResolvedValue({ extractedText: 'text' });
-    mockAnalyzeDocumentWithAi.mockResolvedValue({ summary: 's', keywords: ['k'], category: 'TECH', sentiment: 'POS' });
+    mockAnalyzeDocumentWithAi.mockResolvedValue({
+      summary: 's',
+      keywords: ['k'],
+      category: 'TECH',
+      sentiment: 'POS',
+    });
     mockPublishAnalysisCompletedEvent.mockResolvedValue();
 
     const result = await analyzeDocumentService('DOC1');

@@ -25,6 +25,8 @@ describe('ai sqs handler', () => {
   });
 
   it('throws for malformed messages', async () => {
-    await expect(handleSqsEvent({ Records: [{ body: JSON.stringify({ eventType: 'DocumentProcessed' }) }] })).rejects.toThrow('Invalid SQS message payload');
+    await expect(
+      handleSqsEvent({ Records: [{ body: JSON.stringify({ eventType: 'DocumentProcessed' }) }] })
+    ).rejects.toThrow('Invalid SQS message payload');
   });
 });
